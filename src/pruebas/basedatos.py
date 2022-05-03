@@ -3,7 +3,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-from flask import render_template
+from flask import render_template, request
+from flask.views import MethodView
 
 from src.pruebas import app
 
@@ -14,68 +15,60 @@ db = firestore.client()
 
 
 @app.route("/libreria", methods=["POST", "GET"])
-#     El lunes vamos a recuperar datos del popup y añadirlos al servidor
-#def add_data(añadir):
-#     data = {
-#         u'autor': autor,
-#         u'fecha': fecha,
-#         u'nombre': nombre
-#
-#     }
-#     users_ref = db.collection(collection)
-#     docs = users_ref.stream()
-#     db.collection(collection).document(document).set(data)
-#     for i in docs:
-#         return(collection +" "+ f'{i.id} => {i.to_dict()}')
 
 def show_firebase():
-    lista_libros = []
-    lista_revistas = []
-    libros = db.collection("libros").get()
-    for x in libros:
-        lista_libros.append(x.to_dict())
+    if request.method == "GET":
+        libros_dict = {}
+        revistas_dict = {}
 
-    revistas = db.collection("revistas").get()
-    for x in revistas:
-        lista_revistas.append(x.to_dict())
-
-    print(lista_libros)
-    print(lista_revistas)
-
-    context = {
-        "libros": lista_libros,
-        "revistas": lista_revistas
-    }
-
-    return render_template("BaseCalculadora.html", **context )
+        libros = db.collection("libros").get()
+        for x in libros:
+            libros_dict[x.id] = x.to_dict()
 
 
+        revistas = db.collection("revistas").get()
+        for x in revistas:
+            revistas_dict[x.id] = x.to_dict()
 
-    # for doc in db.collection(search):
-    #     print("hola")
-    #     lista.append(doc.to_dict())
-    # for doc in db.collection(search2):
-    #     lista.append(doc.to_dict())
-    #
-    # cosas= db.collection('libros').document('0').get()
-    # print(cosas)
-    #
-    # context = {
-    #     'cosas': cosas
-    #
-    #
-    # }
+        context = {
+            "libros": libros_dict,
+            "revistas": revistas_dict
+        }
 
-    #return render_template("BaseCalculadora.html", **context)
+        return render_template("BaseCalculadora.html", **context)
 
-#add_data("libros","5",'jonan', 'comon','25-5-2021')
-#return render_template("BaseCalculadora.html", **context)
-#def search_database(collection, collection2):
+    if request.method == "POST":
+
+        body = request.json
+
+        if body.get("accion") == "insertar":
+            print (body)
+            collection_ref = db.collection(body.get("collection")).document(body.get("id"))
+            collection_ref.set({
+                "nombre": body.get("nombre"),
+                "autor": body.get("autor"),
+                "fecha": body.get("fecha")
+            })
+            return "Nuevos datos insertados"
+
+        elif body.get("accion") == "eliminar":
+
+            db.collection(body.get("coleccion")).document(body.get("documento")).delete()
+            return "Datos elimianados"
+
+        else:
+            return "Datos actualizados correctamente"
 
 
 
-    #  return render_template("BaseCalculadora.html", **context)
-#     return ('holamundo')
+
+
+
+
+
+
+
+
 
 #db.collection('jode').delete()
 #search_database("libros","revistas")
@@ -99,3 +92,9 @@ def show_firebase():
 
 
 # filter_list(search_database('libros','revistas','autor','Alvaro'), "01-01-2020")
+
+
+
+
+
+
