@@ -209,11 +209,11 @@
         <div class="popup_content_update">
             <div>
 
-                <input type="hidden" class="data" name="coleccion" >
-                <input type="hidden" class="data" name="id" >
-                <input type="text" class="data" name="nombre" placeholder="Nombre">
-                <input type="text" class="data" name="autor" placeholder="Autor">
-                <input type="date" class="data" name="fecha" value="fecha">
+                <input class="data_update" name="collection" readonly>
+                <input class="data_update" name="id" readonly>
+                <input type="text" class="data_update" name="nombre" placeholder="Nombre">
+                <input type="text" class="data_update" name="autor" placeholder="Autor">
+                <input type="date" class="data_update" name="fecha" value="fecha">
 
                 <div class="popup_buttons_update">
                     <button id="update">Modificar</button>
@@ -233,35 +233,27 @@
 
             <table>
                 <thead>
-                    <th>Referencia</th>
+                    <th>ID Coleccion</th>
+                    <th>ID Documento</th>
                     <th>Nombre</th>
                     <th>Autor</th>
                     <th>Fecha</th>
                     <th><i class="fas fa-plus-circle"></i></th>
                 </thead>
                     <tbody id="myTable">
-                    {% for k,v in libros.items() %}
-                        <tr>
-                            <td name="id" id="libros">{{k}}</td>
-                            <td name="nombre">{{v.nombre}}</td>
-                            <td name="autor">{{v.autor}}</td>
-                            <td name="fecha">{{v.fecha}}</td>
-                            <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
-                            <td><img src="{{v.imagen}}" alt=""></td>
-                        </tr>
+                    {% for k in dict.keys() %}
+                        {% for x,v in dict[k].items() %}
+                            <tr>
+                                <td name="coleccion" id="coleccion">{{k}}</td>
+                                <td name="id" id="documento">{{x}}</td>
+                                <td name="nombre">{{v.nombre}}</td>
+                                <td name="autor">{{v.autor}}</td>
+                                <td name="fecha">{{v.fecha}}</td>
+                                <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
+                                <td><img src="{{v.imagen}}" alt=""></td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
-
-                    {% for k,v in revistas.items() %}
-                        <tr>
-                            <td name="id" id="revistas">{{k}}</td>
-                            <td name="nombre">{{v.nombre}}</td>
-                            <td>{{v.autor}}</td>
-                            <td>{{v.fecha}}</td>
-                            <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
-                        </tr>
-                    {% endfor %}
-
-
                 </tbody>
             </table>
         </div>
@@ -288,6 +280,10 @@
         //Boton actualizar
         $(".fa-edit").click(function(){
             $(".popup_wrapper_update").css("display", "flex")
+            let id_coleccion = $(this).parent().siblings("#coleccion").text();
+            let id_documento = $(this).parent().siblings("#documento").text();
+            $("input[name='collection']").val(id_coleccion);
+            $("input[name='id']").val(id_documento);
 
         })
 
@@ -304,9 +300,14 @@
 
         //Función del botón enviar
         $("#send").on("click", function (){
+            //data= son los datos del diccionario vacio
             let data={}
+            //data_list= me va a devolver una lista de inputs
             let data_list = $(".data");
+            //each es un for que recorre todos los inputs
             $.each(data_list, function (){
+                //this hace referencia al elemento por el que va en cada vuelta
+                //
                 data[$(this).attr("name")] = $(this).val();
             })
 
@@ -356,18 +357,15 @@
         });
         })
 
-        //Boton actualizar
+        //Boton modificar
         $("#update").on('click',function(){
             let data={}
-            let data_list = $(".data");
+            let data_list = $(".data_update");
             $.each(data_list, function (){
-
                 data[$(this).attr("name")] = $(this).val();
             })
-
-
         data["accion"] = "actualizar";
-
+        console.log(data)
         $.ajax({
             method: "POST",
             url: "/libreria",
