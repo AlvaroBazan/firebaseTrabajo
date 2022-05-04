@@ -73,12 +73,12 @@
         td{
             margin: 10px 0;
             width: 20%;
+            max-width: 25%;
             height: 15%;
             padding: 2px 5px;
             text-align: center;
             color: black;
             word-break: break-word;
-
         }
         .filter {
             color: #446Ca9;
@@ -88,6 +88,7 @@
         }
         .filter input{
             width: 100%;
+
         }
         label{
             font-size: 25px;
@@ -105,16 +106,30 @@
                 flex-direction: column;
             }
         }
-
-        i{
+        /*Posicion y tamaño de los botones añadir, eliminar y actualizar*/
+        .fa-minus-circle,.fa-plus-circle,.fa-edit{
             cursor: pointer;
+            font-size: 18px;
+            margin: 0 10px;
         }
-        fa-plus-circle,fa-xmark-large:hover{
+        /*Resaltar el boton de añadir*/
+        .fa-plus-circle:hover{
             transform: scale(1.2);
             color: green;
-        }
 
-        .popup_wrapper{
+        }
+        /*Resaltar el boton de eliminar*/
+        .fa-minus-circle:hover{
+            transform: scale(1.2);
+            color: red;
+        }
+        /*Resaltar el boton de editar*/
+        .fa-edit:hover{
+            transform: scale(1.2);
+            color:blue;
+        }
+        /*Este es la posicion del popup*/
+        .popup_wrapper_saved,.popup_wrapper_update{
             width: 100%;
             height: 95vh;
             position: absolute;
@@ -125,15 +140,17 @@
             /*Propiedad para mostrar (display) un elemento o no*/
             display: none;
         }
-        .opacity{
+        /*Es necesario darle opacidad al popup para no poder pinchar fuera*/
+        /*De el cuando esta fuera*/
+        .opacity_saved,.opacity_update{
             width: 100%;
             height: 100vh;
             position: absolute;
         }
-
-        .popup_content{
+        /*Posicionamiento colores y datos del popupp*/
+        .popup_content_saved,.popup_content_update{
             height: 15vh;
-            width: 40%;
+            width: 60%;
             background-color: rgba(68,108,169 ,1);
             position: absolute;
             display: flex;
@@ -141,37 +158,66 @@
             align-items: center;border-radius: 10px;
             box-shadow: 0 0 30px grey;
         }
-        .popup_buttons{
+        /*Botones del enviar y cancelar dentro del popup*/
+        .popup_buttons_saved,.popup_buttons_update{
             margin-top: 10px;
             display: flex;
             justify-content: center;
         }
-
-        .popup_buttons button{
+        /*Posicion de los botones enviar y cancelar dentro del popup*/
+        .popup_buttons_saved button,.popup_buttons_update button{
             width: 30%;
             margin: 0 0;
             margin: 0 1em;
         }
+
+        img{
+            width: 200px;
+        }
+
 
     </style>
 </head>
 
 <body>
 
-<form action="">
-    <input type="text" name="prueba1">
-    <input type="text" name="prueba2">
-</form>
-    <div class="popup_wrapper">
-        <div class="opacity"></div>
-        <div class="popup_content">
+    <div class="popup_wrapper_saved">
+        <div class="opacity_saved"></div>
+        <div class="popup_content_saved">
             <div>
-                <input type="text" name="nombre" placeholder="Nombre">
-                <input type="text" name="autor" placeholder="Autor">
-                <input type="date" name="fecha">
-                <div class="popup_buttons">
+
+                <select name="collection" class="select_tipo data">
+                <option selected disabled>Selecciona Libreria</option>
+                    {% for i in tipos %}
+                <option value='{{ i }}'>{{ i }}</option>
+                    {%endfor%}
+                </select>
+                <input type="text" class="data" name="nombre" placeholder="Nombre">
+                <input type="text" class="data" name="autor" placeholder="Autor">
+                <input type="date" class="data" name="fecha" value="fecha">
+
+                <div class="popup_buttons_saved">
                     <button id="send">Enviar</button>
                     <button id="cancel">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="popup_wrapper_update">
+        <div class="opacity_update"></div>
+        <div class="popup_content_update">
+            <div>
+
+                <input type="hidden" class="data" name="coleccion" >
+                <input type="hidden" class="data" name="id" >
+                <input type="text" class="data" name="nombre" placeholder="Nombre">
+                <input type="text" class="data" name="autor" placeholder="Autor">
+                <input type="date" class="data" name="fecha" value="fecha">
+
+                <div class="popup_buttons_update">
+                    <button id="update">Modificar</button>
+                    <button id="cancelar">Cancelar</button>
                 </div>
 
             </div>
@@ -187,29 +233,35 @@
 
             <table>
                 <thead>
+                    <th>Referencia</th>
                     <th>Nombre</th>
                     <th>Autor</th>
                     <th>Fecha</th>
                     <th><i class="fas fa-plus-circle"></i></th>
                 </thead>
                     <tbody id="myTable">
-                    {% for x in libros %}
+                    {% for k,v in libros.items() %}
                         <tr>
-                            <td>
-                                {{x.nombre}}
-                            </td>
-                            <td>
-                                {{x.autor}}
-                            </td>
-                             <td>
-                                {{x.fecha}}
-                            </td>
-                            <td>
-                               <i class="fas fa-minus-circle"></i>
-                            </td>
+                            <td name="id" id="libros">{{k}}</td>
+                            <td name="nombre">{{v.nombre}}</td>
+                            <td name="autor">{{v.autor}}</td>
+                            <td name="fecha">{{v.fecha}}</td>
+                            <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
+                            <td><img src="{{v.imagen}}" alt=""></td>
                         </tr>
                     {% endfor %}
-                    </tbody>
+
+                    {% for k,v in revistas.items() %}
+                        <tr>
+                            <td name="id" id="revistas">{{k}}</td>
+                            <td name="nombre">{{v.nombre}}</td>
+                            <td>{{v.autor}}</td>
+                            <td>{{v.fecha}}</td>
+                            <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
+                        </tr>
+                    {% endfor %}
+
+
                 </tbody>
             </table>
         </div>
@@ -221,7 +273,6 @@
 
     $(document).ready(function(){
 
-
         //Función para filtrado de datos
         $("#filtro").on("keyup", function() {
             var value = $(this).val().toLowerCase();
@@ -229,13 +280,106 @@
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
         });
-
+        // boton insertar
         $(".fa-plus-circle").click(function (){
-            $(".popup_wrapper").css("display", "flex")
+            $(".popup_wrapper_saved").css("display", "flex")
 
         })
+        //Boton actualizar
+        $(".fa-edit").click(function(){
+            $(".popup_wrapper_update").css("display", "flex")
+
+        })
+
+        //Boton cancelar dentro del popup
          $("#cancel").on("click", function (){
-            $(".popup_wrapper").css("display", "none")
+            $(".popup_wrapper_saved").css("display", "none")
+        });
+
+        //Boton cancelar dentro del popup update
+         $("#cancelar").on("click", function (){
+            $(".popup_wrapper_update").css("display", "none")
+        });
+
+
+        //Función del botón enviar
+        $("#send").on("click", function (){
+            let data={}
+            let data_list = $(".data");
+            $.each(data_list, function (){
+                data[$(this).attr("name")] = $(this).val();
+            })
+
+            data["accion"] = "insertar";
+            //Envio de datos a la base de datos nuevos con el post
+            $.ajax({
+                method: "POST",
+                url: "/libreria",
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: (response) =>{
+                    if(response != ""){
+                        console.log(response);
+                        alert("libro o revista guardado con éxito");
+                        // esto de window.location se pone para que actualice la pagina automatica
+                        //nada mas darle al enviar
+                        window.location.reload(window.location.href);
+                    }
+                }
+            });
+        })
+
+        //Boton eliminar
+        $(".fa-minus-circle").click(function (){
+        let padre_boton = $(this).parent();
+        let hermanos = padre_boton.siblings();
+        let data ={}
+        $.each(hermanos, function (){
+            if (hermanos.index($(this)) === 0){
+                data["coleccion"] = $(this).attr("id");
+                data["documento"] = $(this).text();
+            }
+        })
+        data["accion"] = "eliminar";
+
+
+        $.ajax({
+            method: "POST",
+            url: "/libreria",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: (response) => {
+                console.log(response);
+                alert("Datos eliminados");
+                window.location.reload(window.location.href);
+            }
+        });
+        })
+
+        //Boton actualizar
+        $("#update").on('click',function(){
+            let data={}
+            let data_list = $(".data");
+            $.each(data_list, function (){
+
+                data[$(this).attr("name")] = $(this).val();
+            })
+
+
+        data["accion"] = "actualizar";
+
+        $.ajax({
+            method: "POST",
+            url: "/libreria",
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: (response) => {
+                console.log(response);
+                alert("Datos Actualizados con exito");
+                window.location.reload(window.location.href);
+            }
+
+        })
         })
 
   });
