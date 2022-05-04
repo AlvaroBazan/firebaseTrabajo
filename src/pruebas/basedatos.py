@@ -18,23 +18,28 @@ db = firestore.client()
 
 def show_firebase():
     if request.method == "GET":
-        libros_dict = {}
-        revistas_dict = {}
+        dict = {}
         tipos=['libros','revistas']
         libros = db.collection("libros").get()
+        #Devuelve el id (nombre) de la colección
+        id_libro = db.collection("libros").id
+        dict[id_libro] = {}
         for x in libros:
-            libros_dict[x.id] = x.to_dict()
-
-        print(libros_dict)
+            #Libros_dict es un diccionario que a su vez contiene otro diccionario. En cada vuelta del bucle le decimos que
+            #vaya al diccionario libros_dict y acceda a la clave "id_libro" que es el nombre de la colección "libros", es decir,
+            # accede a libros_dict["libros"] y dentro de ese diccionario vuelve a añadir clave/valor en base a los datos recuperados
+            #donde la clave es el id deo documento y el valor los datos recuperados
+            dict[id_libro][x.id] = x.to_dict()
 
 
         revistas = db.collection("revistas").get()
+        id_revistas = db.collection("revistas").id
+        dict[id_revistas] = {}
         for x in revistas:
-            revistas_dict[x.id] = x.to_dict()
+            dict[id_revistas][x.id] = x.to_dict()
 
         context = {
-            "libros": libros_dict,
-            "revistas": revistas_dict,
+            "dict": dict,
             'tipos': tipos
         }
 
@@ -59,7 +64,7 @@ def show_firebase():
             return "Datos elimianados"
 
         elif body.get("accion") == "actualizar":
-
+            print(body)
             collection_ref = db.collection(body.get("collection")).document(body.get("id"))
             collection_ref.set({
                 "nombre": body.get("nombre"),
