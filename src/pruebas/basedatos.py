@@ -20,10 +20,12 @@ def show_firebase():
     if request.method == "GET":
         libros_dict = {}
         revistas_dict = {}
-
+        tipos=['libros','revistas']
         libros = db.collection("libros").get()
         for x in libros:
             libros_dict[x.id] = x.to_dict()
+
+        print(libros_dict)
 
 
         revistas = db.collection("revistas").get()
@@ -32,7 +34,8 @@ def show_firebase():
 
         context = {
             "libros": libros_dict,
-            "revistas": revistas_dict
+            "revistas": revistas_dict,
+            'tipos': tipos
         }
 
         return render_template("BaseCalculadora.html", **context)
@@ -42,22 +45,32 @@ def show_firebase():
         body = request.json
 
         if body.get("accion") == "insertar":
-            print (body)
-            collection_ref = db.collection(body.get("collection")).document(body.get("id"))
-            collection_ref.set({
+            db.collection(body.get("collection")).add({
                 "nombre": body.get("nombre"),
                 "autor": body.get("autor"),
                 "fecha": body.get("fecha")
             })
-            return "Nuevos datos insertados"
+
+            return "Datos creados"
 
         elif body.get("accion") == "eliminar":
 
             db.collection(body.get("coleccion")).document(body.get("documento")).delete()
             return "Datos elimianados"
 
-        else:
+        elif body.get("accion") == "actualizar":
+
+            collection_ref = db.collection(body.get("collection")).document(body.get("id"))
+            collection_ref.set({
+                "nombre": body.get("nombre"),
+                "autor": body.get("autor"),
+                "fecha": body.get("fecha")
+            })
+
             return "Datos actualizados correctamente"
+
+        else:
+            return "No inventes"
 
 
 
