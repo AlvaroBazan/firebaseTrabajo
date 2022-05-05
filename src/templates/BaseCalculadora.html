@@ -172,7 +172,7 @@
         }
 
         img{
-            width: 200px;
+            width: 150px;
         }
 
 
@@ -208,7 +208,8 @@
         <div class="opacity_update"></div>
         <div class="popup_content_update">
             <div>
-
+<!--            El imnput se puede hacer de type="hidden para que no se muestre
+                y que la informacion aunque se autocomplete no se viera"-->
                 <input class="data_update" name="collection" readonly>
                 <input class="data_update" name="id" readonly>
                 <input type="text" class="data_update" name="nombre" placeholder="Nombre">
@@ -239,6 +240,7 @@
                     <th>Autor</th>
                     <th>Fecha</th>
                     <th><i class="fas fa-plus-circle"></i></th>
+                    <th>IMAGEN</th>
                 </thead>
                     <tbody id="myTable">
                     {% for k in dict.keys() %}
@@ -250,6 +252,12 @@
                                 <td name="autor">{{v.autor}}</td>
                                 <td name="fecha">{{v.fecha}}</td>
                                 <td><i class="fas fa-edit"></i><i class="fas fa-minus-circle"></i></td>
+<!--                                Para meter la imagen, entras en la imagen completamente hasta visualizarla -->
+<!--                                dentro de firebase y copias esa url, dentro del campo le metes el campo tipo-->
+<!--                                imagen como STR importante y pegas la url
+                                    Ejemplo-->
+                                <!--https://firebasestorage.googleapis.com/v0/b/projectoalvaro.appspot.com/o/gatoleyendo.gif?alt=media&token=1267d1b7-acbf-47f5-ac0c-c67fc8b6cf8f
+-->
                                 <td><img src="{{v.imagen}}" alt=""></td>
                             </tr>
                         {% endfor %}
